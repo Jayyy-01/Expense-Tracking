@@ -1,0 +1,107 @@
+:root{
+  --bg:#0b1220;
+  --card:#101a33;
+  --muted:#a8b3cf;
+  --text:#e9eeff;
+  --accent:#4f7cff;
+  --danger:#ff4d6d;
+  --ok:#2dd4bf;
+  --border:rgba(255,255,255,.08);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background:linear-gradient(180deg,#0b1220,#070c16);
+  color:var(--text);
+}
+.container{
+  max-width:1000px;
+  margin:40px auto;
+  padding:0 16px;
+}
+.card{
+  background:rgba(16,26,51,.85);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:18px;
+  box-shadow:0 12px 40px rgba(0,0,0,.35);
+  backdrop-filter: blur(8px);
+}
+.row{display:flex; gap:12px; flex-wrap:wrap}
+.row > *{flex:1}
+h1,h2{margin:0 0 12px}
+h1{font-size:26px}
+h2{font-size:18px; color:var(--muted); font-weight:600}
+
+label{display:block; font-size:12px; color:var(--muted); margin:10px 0 6px}
+input, select, button, textarea{
+  width:100%;
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:#0c1530;
+  color:var(--text);
+  outline:none;
+}
+input:focus, select:focus, textarea:focus{
+  border-color:rgba(79,124,255,.6);
+  box-shadow:0 0 0 3px rgba(79,124,255,.18);
+}
+button{
+  cursor:pointer;
+  background:var(--accent);
+  border:none;
+  font-weight:700;
+}
+button.secondary{
+  background:transparent;
+  border:1px solid var(--border);
+  color:var(--text);
+}
+button.danger{background:var(--danger)}
+small.helper{color:var(--muted)}
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:16px;
+}
+.badge{
+  padding:6px 10px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  color:var(--muted);
+  font-size:12px;
+}
+.alert{
+  margin-top:12px;
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.04);
+  color:var(--muted);
+}
+.alert.ok{border-color:rgba(45,212,191,.35); color:#bff7ee}
+.alert.err{border-color:rgba(255,77,109,.35); color:#ffd1da}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:12px;
+  overflow:hidden;
+  border-radius:14px;
+  border:1px solid var(--border);
+}
+th,td{
+  padding:10px 12px;
+  border-bottom:1px solid var(--border);
+  text-align:left;
+  font-size:14px;
+}
+th{color:var(--muted); font-weight:700; background:rgba(255,255,255,.03)}
+tr:hover td{background:rgba(255,255,255,.02)}
+.actions{display:flex; gap:8px}
+.actions button{width:auto; padding:8px 10px; border-radius:10px; font-size:12px}
