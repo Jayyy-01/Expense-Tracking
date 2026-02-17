@@ -1,19 +1,19 @@
-const API_BASE = "http://127.0.0.1:8000";
+const API = "http://127.0.0.1:8000";
 
-function getToken() {
-    return localStorage.getItem("token");
+function saveToken(token) {
+    localStorage.setItem("access_token", token);
 }
 
-function setToken(token) {
-    localStorage.setItem("token", token);
+function getToken() {
+    return localStorage.getItem("access_token");
 }
 
 function logout() {
-    localStorage.removeItem("token");
+    localStorage.removeItem("access_token");
     window.location.href = "index.html";
 }
 
-// ================= LOGIN =================
+// -------- LOGIN --------
 async function loginUser() {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
@@ -22,116 +22,160 @@ async function loginUser() {
     formData.append("username", email);
     formData.append("password", password);
 
-    try {
-        const response = await fetch(`${API_BASE}/login`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            body: formData
-        });
+    const res = await fetch(`${API}/login`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: formData
+    });
 
-        if (!response.ok) {
-            document.getElementById("error").innerText = "Invalid credentials";
-            return;
-        }
-
-        const data = await response.json();
-        setToken(data.access_token);
-        window.location.href = "dashboard.html";
-
-    } catch (err) {
-        document.getElementById("error").innerText = "Server error";
+    if (!res.ok) {
+        document.getElementById("output").innerText = "Login failed";
+        return;
     }
+
+    const data = await res.json();
+    saveToken(data.access_token);
+
+    window.location.href = "dashboard.html";
 }
 
-// ================= ADD EXPENSE =================
+// -------- ADD EXPENSE --------
 async function addExpense() {
+    const token = getToken();
+    if (!token) {
+        document.getElementById("output").innerText = "Not logged in";
+        return;
+    }
+
     const amount = parseFloat(document.getElementById("amount").value);
     const category = document.getElementById("category").value;
     const description = document.getElementById("description").value;
 
-    const response = await fetch(`${API_BASE}/expense`, {
+    const res = await fetch(`${API}/expense`, {
         method: "POST",
         headers: {
-            "Authorization": `Bearer ${getToken()}`,
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify({
-            amount,
-            category,
-            description
-        })
+        body: JSON.stringify({ amount, category, description })
     });
 
-    if (response.ok) {
-        alert("Expense added");
-        loadMonthlySummary();
-    } else {
-        alert("Failed to add expense");
-    }
+    const data = await res.json();
+    document.getElementById("output").innerText = JSON.stringify(data, null, 2);
 }
 
-// ================= MONTHLY =================
+// -------- MONTHLY SUMMARY --------
 async function loadMonthlySummary() {
-    const year = document.getElementById("year").value;
-    const month = document.getElementById("month").value;
-
-    const response = await fetch(
-        `${API_BASE}/monthly-summary?year=${year}&month=${month}`,
-        {
-            headers: {
-                "Authorization": `Bearer ${getToken()}`
-            }
-        }
-    );
-
-    if (response.status === 401) {
-        logout();
+    const token = getToken();
+    if (!token) {
+        document.getElementById("output").innerText = "Not logged in";
         return;
     }
 
-    const data = await response.json();
-    document.getElementById("output").innerText =
-        JSON.stringify(data, null, 2);
+    const year = document.getElementById("monthYear").value;
+    const month = document.getElementById("monthNumber").value;
+
+    const res = await fetch(`${API}/monthly-summary?year=${year}&month=${month}`, {
+        headers: { "Authorization": `Bearer ${token}` }
+    });
+
+    const data = await res.json();
+    document.getElementById("output").innerText = JSON.stringify(data, null, 2);
 }
 
-// ================= YEARLY =================
+// -------- YEARLY SUMMARY --------
 async function loadYearlySummary() {
-    const year = document.getElementById("year").value;
+    const token = getToken();
+    if (!token) {
+        document.getElementById("output").innerText = "Not logged in";
+        return;
+    }
 
-    const response = await fetch(
-        `${API_BASE}/yearly-summary?year=${year}`,
-        {
-            headers: {
-                "Authorization": `Bearer ${getToken()}`
-            }
-        }
-    );
+    const year = document.getElementById("yearInput").value;
 
-    const data = await response.json();
-    document.getElementById("output").innerText =
-        JSON.stringify(data, null, 2);
+    const res = await fetch(`${API}/yearly-summary?year=${year}`, {
+        headers: { "Authorization": `Bearer ${token}` }
+    });
+
+    const data = await res.json();
+    document.getElementById("output").innerText = JSON.stringify(data, null, 2);
 }
 
-// ================= EXPORT =================
-function exportExcel() {
-    const year = document.getElementById("year").value;
-    const month = document.getElementById("month").value;
+// -------- DOWNLOAD EXCEL (MONTH) --------
+function downloadExcelMonth() {
+    const token = getToken();
+    const year = document.getElementById("monthYear").value;
+    const month = document.getElementById("monthNumber").value;
 
-    const url =
-        `${API_BASE}/export/excel?year=${year}&month=${month}`;
+    if (!token) {
+        alert("Not logged in!");
+        return;
+    }
+    if (!year || !month) {
+        alert("Enter year and month!");
+        return;
+    }
 
-    fetch(url, {
-        headers: {
-            "Authorization": `Bearer ${getToken()}`
-        }
+    fetch(`${API}/export/excel?year=${year}&month=${month}`, {
+        method: "GET",
+        headers: { "Authorization": `Bearer ${token}` }
     })
-        .then(res => res.blob())
-        .then(blob => {
-            const link = document.createElement("a");
-            link.href = window.URL.createObjectURL(blob);
-            link.download = "expenses.xlsx";
-            link.click();
-        });
+    .then(res => {
+        if (!res.ok) throw new Error("Download failed");
+        return res.blob();
+    })
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `expenses_${year}_${month}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Monthly Excel download failed.");
+    });
+}
+
+// -------- DOWNLOAD EXCEL (YEAR) --------
+function downloadExcelYear() {
+    const token = getToken();
+    const year = document.getElementById("yearInput").value;
+
+    if (!token) {
+        alert("Not logged in!");
+        return;
+    }
+    if (!year) {
+        alert("Enter year!");
+        return;
+    }
+
+    fetch(`${API}/export/excel?year=${year}`, {
+        method: "GET",
+        headers: { "Authorization": `Bearer ${token}` }
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("Download failed");
+        return res.blob();
+    })
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `expenses_${year}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Yearly Excel download failed.");
+    });
 }

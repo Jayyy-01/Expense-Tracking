@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard</title>
+    <title>Expense Tracker - Dashboard</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -10,35 +10,45 @@
 <div class="container">
     <h1>Dashboard</h1>
 
-    <button onclick="loadSummary()">Load Monthly Summary</button>
-    <button class="secondary" onclick="logout()">Logout</button>
+    <!-- ADD EXPENSE -->
+    <div class="card">
+        <h2>Add Expense</h2>
 
+        <input type="number" id="amount" placeholder="Amount" />
+        <input type="text" id="category" placeholder="Category" />
+        <input type="text" id="description" placeholder="Description" />
+
+        <button onclick="addExpense()">Add Expense</button>
+    </div>
+
+    <!-- MONTHLY SUMMARY -->
+    <div class="card">
+        <h2>Monthly Summary</h2>
+
+        <input type="number" id="monthYear" placeholder="Year" />
+        <input type="number" id="monthNumber" placeholder="Month (1-12)" />
+
+        <button onclick="loadMonthlySummary()">Load Monthly Summary</button>
+        <button onclick="downloadExcelMonth()">Download Excel (Month)</button>
+    </div>
+
+    <!-- YEARLY SUMMARY -->
+    <div class="card">
+        <h2>Yearly Summary</h2>
+
+        <input type="number" id="yearInput" placeholder="Year" />
+
+        <button onclick="loadYearlySummary()">Load Yearly Summary</button>
+        <button type="button" onclick="downloadExcelYear()">Download Excel (Year)</button>
+
+    </div>
+
+    <button onclick="logout()">Logout</button>
+
+    <h3>Output</h3>
     <pre id="output"></pre>
 </div>
 
-<script>
-const API = "http://127.0.0.1:8000";
-
-function loadSummary() {
-    const token = localStorage.getItem("token");
-
-    fetch(`${API}/monthly-summary?year=2026&month=2`, {
-        headers: {
-            "Authorization": `Bearer ${token}`
-        }
-    })
-    .then(res => res.json())
-    .then(data => {
-        document.getElementById("output").innerText =
-            JSON.stringify(data, null, 2);
-    });
-}
-
-function logout() {
-    localStorage.removeItem("token");
-    window.location.href = "index.html";
-}
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
