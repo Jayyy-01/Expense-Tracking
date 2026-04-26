@@ -15,7 +15,7 @@ A RESTful API to track daily expenses, manage budgets, and analyze spending patt
 ## ⚙️ Setup Steps
 
 1. Clone the repository
-   git clone <https://github.com/Jayyy-01/Expense-Tracking/edit/main/README.md>
+   git clone <https://github.com/Jayyy-01/Expense-Tracking>
 
 2. Navigate to the project folder
    cd expense-tracker-api
