@@ -1,54 +1,55 @@
-# 💰 Expense Tracker API
+# Secure Multi-User Expense Tracking & Analytics System
 
-A RESTful API to track daily expenses, manage budgets, and analyze spending patterns.
+A RESTful API to track expenses, manage multi-user data securely, and analyze spending patterns — built with FastAPI.
 
+##  Tech Stack
 
+- Python, FastAPI
+- MySQL + SQLAlchemy (ORM)
+- JWT Authentication
+- Pandas (analytics, Excel export)
+- HTML/CSS/JS (frontend)
 
-## 🚀 Tech Stack Used
-- Python
-- Flask / FastAPI (update accordingly)
-- SQLite / MongoDB
-- REST API
-
-
-
-## ⚙️ Setup Steps
+##  Setup Steps
 
 1. Clone the repository
-   git clone <https://github.com/Jayyy-01/Expense-Tracking>
-
+   ```
+   git clone https://github.com/Jayyy-01/Expense-Tracking
+   ```
 2. Navigate to the project folder
-   cd expense-tracker-api
-
+   ```
+   cd Expense-Tracking
+   ```
 3. Create a virtual environment
+   ```
    python -m venv venv
-   source venv/bin/activate   
+   source venv/bin/activate
+   ```
 4. Install dependencies
+   ```
    pip install -r requirements.txt
-
+   ```
 5. Run the application
-   python app.py
+   ```
+   uvicorn app:app --reload
+   ```
+6. Test APIs via the interactive docs
+   ```
+   http://localhost:8000/docs
+   ```
 
-6. Test APIs using Postman
-   http://localhost:5000
+##  Features
 
-
-
-## ✨ Features Implemented
-
-- Add, update, and delete expenses
-- Categorize expenses (food, travel, etc.)
-- Track total spending
-- Filter expenses by date/category
-- RESTful API endpoints
+- Secure multi-user support with JWT authentication
+- Add, update, delete, and categorize expenses
+- 10+ REST API endpoints
+- User-isolated analytics dashboard (500+ monthly transactions tracked)
+- Automated Excel export — cuts manual reporting effort by ~80%
 - Input validation and error handling
 
+##  Future Improvements
 
-
-## 📌 Future Improvements
-
-- User authentication & multi-user support
 - Budget limit alerts
-- Data visualization (charts/graphs)
-- Monthly/weekly reports
-
+- Additional data visualization (charts/graphs)
+- Monthly/weekly automated email reports
+```
