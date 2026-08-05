@@ -31,28 +31,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ---------- Static File & Frontend Mounting ----------
-# Locates front-end folder relative to back-end directory
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-FRONTEND_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "front-end"))
-
-# Mount static frontend directory
-if os.path.exists(FRONTEND_DIR):
-    app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
-
-# Routes to serve frontend HTML pages
-@app.get("/", response_class=FileResponse)
-def read_index():
-    index_path = os.path.join(FRONTEND_DIR, "index.html")
-    return FileResponse(index_path, media_type="text/html")
-
-@app.get("/dashboard", response_class=FileResponse)
-def read_dashboard():
-    dashboard_path = os.path.join(FRONTEND_DIR, "dashboard.html")
-    if not os.path.exists(dashboard_path):
-        raise HTTPException(status_code=404, detail="Dashboard file not found")
-    return dashboard_path
-
 
 # ---------- JWT & Security ----------
 SECRET_KEY = os.getenv("SECRET_KEY", "CHANGE_THIS_TO_A_LONG_RANDOM_SECRET")
@@ -338,3 +316,11 @@ def export_excel(
             "Content-Disposition": f"attachment; filename={filename}.xlsx"
         },
     )
+
+
+# ---------- Static File & Frontend Mounting ----------
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FRONTEND_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "front-end"))
+
+if os.path.exists(FRONTEND_DIR):
+    app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="static")
