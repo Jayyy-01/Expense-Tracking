@@ -320,7 +320,11 @@ def export_excel(
 
 # ---------- Static File & Frontend Mounting ----------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Check both parent directory (local) and current directory (if flattened on deployment)
 FRONTEND_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "front-end"))
+if not os.path.exists(FRONTEND_DIR):
+    FRONTEND_DIR = os.path.abspath(os.path.join(BASE_DIR, "front-end"))
 
 if os.path.exists(FRONTEND_DIR):
     app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="static")
