@@ -1,4 +1,4 @@
-const API = "https://expense-tracker-api-7xzx.onrender.com";
+const API = "";
 
 function saveToken(token) {
     localStorage.setItem("access_token", token);

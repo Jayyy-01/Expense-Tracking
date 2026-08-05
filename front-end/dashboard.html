@@ -3,52 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <title>Expense Tracker - Dashboard</title>
+<!--    <link rel="stylesheet" href="/static/style.css">-->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="container">
     <h1>Dashboard</h1>
+    <button onclick="logout()">Logout</button>
 
-    <!-- ADD EXPENSE -->
     <div class="card">
         <h2>Add Expense</h2>
-
         <input type="number" id="amount" placeholder="Amount" />
-        <input type="text" id="category" placeholder="Category" />
+        <input type="text" id="category" placeholder="Category (e.g. Food, Rent)" />
         <input type="text" id="description" placeholder="Description" />
-
         <button onclick="addExpense()">Add Expense</button>
     </div>
 
-    <!-- MONTHLY SUMMARY -->
     <div class="card">
-        <h2>Monthly Summary</h2>
-
-        <input type="number" id="monthYear" placeholder="Year" />
-        <input type="number" id="monthNumber" placeholder="Month (1-12)" />
-
-        <button onclick="loadMonthlySummary()">Load Monthly Summary</button>
-        <button onclick="downloadExcelMonth()">Download Excel (Month)</button>
+        <h2>My Expenses</h2>
+        <button onclick="loadExpenses()">Refresh List</button>
+        <ul id="expenseList"></ul>
     </div>
-
-    <!-- YEARLY SUMMARY -->
-    <div class="card">
-        <h2>Yearly Summary</h2>
-
-        <input type="number" id="yearInput" placeholder="Year" />
-
-        <button onclick="loadYearlySummary()">Load Yearly Summary</button>
-        <button type="button" onclick="downloadExcelYear()">Download Excel (Year)</button>
-
-    </div>
-
-    <button onclick="logout()">Logout</button>
-
-    <h3>Output</h3>
-    <pre id="output"></pre>
 </div>
 
+<!--<script src="/static/script.js"></script>-->
 <script src="script.js"></script>
 </body>
 </html>
