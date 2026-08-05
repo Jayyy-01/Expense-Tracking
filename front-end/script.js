@@ -1,4 +1,4 @@
-const API = "http://127.0.0.1:8000";
+const API = "https://expense-tracker-api-7xzx.onrender.com";
 
 function saveToken(token) {
     localStorage.setItem("access_token", token);
