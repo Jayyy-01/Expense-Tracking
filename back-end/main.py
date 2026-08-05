@@ -1,16 +1,19 @@
+import os
+import io
+import openpyxl
+from datetime import datetime, timedelta
+from typing import Optional, List, Dict
+
 from fastapi import FastAPI, Depends, HTTPException, status, Query
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, EmailStr
-from typing import Optional, List, Dict
-from datetime import datetime, timedelta
 from jose import jwt, JWTError
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from sqlalchemy import func, extract
-import io
-import openpyxl
 
 from database import SessionLocal, engine
 from models import Base, User, Expense
@@ -19,24 +22,42 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Expense Tracker API")
 
-# ✅ CORS (needed for frontend on localhost:63342)
+# ✅ CORS Configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:63342",
-        "http://127.0.0.1:63342",
-        "http://localhost:8000",
-        "http://127.0.0.1:8000",
-        "http://localhost",
-        "http://127.0.0.1",
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# JWT
-SECRET_KEY = "CHANGE_THIS_TO_A_LONG_RANDOM_SECRET"
+# ---------- Static File & Frontend Mounting ----------
+# Locates front-end folder relative to back-end directory
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FRONTEND_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "front-end"))
+
+# Mount static frontend directory
+if os.path.exists(FRONTEND_DIR):
+    app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
+
+# Routes to serve frontend HTML pages
+@app.get("/", response_class=FileResponse)
+def read_index():
+    index_path = os.path.join(FRONTEND_DIR, "index.html")
+    if not os.path.exists(index_path):
+        raise HTTPException(status_code=404, detail="Index file not found")
+    return index_path
+
+@app.get("/dashboard", response_class=FileResponse)
+def read_dashboard():
+    dashboard_path = os.path.join(FRONTEND_DIR, "dashboard.html")
+    if not os.path.exists(dashboard_path):
+        raise HTTPException(status_code=404, detail="Dashboard file not found")
+    return dashboard_path
+
+
+# ---------- JWT & Security ----------
+SECRET_KEY = os.getenv("SECRET_KEY", "CHANGE_THIS_TO_A_LONG_RANDOM_SECRET")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 
@@ -117,12 +138,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     return user
 
 
-# ---------- Routes ----------
-@app.get("/")
-def home():
-    return {"message": "Expense Tracker API running"}
-
-
+# ---------- API Routes ----------
 @app.post("/register")
 def register(data: RegisterIn, db: Session = Depends(get_db)):
     existing = db.query(User).filter(User.email == data.email).first()
@@ -136,13 +152,9 @@ def register(data: RegisterIn, db: Session = Depends(get_db)):
     return {"message": "Registered successfully", "user_id": user.id}
 
 
-# ✅ Swagger OAuth2 (password flow) uses FORM fields: username + password
 @app.post("/login", response_model=TokenOut)
 def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    # form.username will contain your email
     user = db.query(User).filter(User.email == form.username).first()
-
-    # ✅ FIX: user has hashed_password, not password
     if (not user) or (not verify_password(form.password, user.hashed_password)):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
