@@ -1,24 +1,23 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-#MySQL connection (your existing one is correct)
-DATABASE_URL = "mysql+pymysql://root:iamfunny05@localhost/expense_tracker"
+# Fetch database URL from environment variable, falling back to local SQLite
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./expense.db")
 
-# create engine
-engine = create_engine(DATABASE_URL)
+# Create engine with appropriate options for SQLite vs MySQL/PostgreSQL
+if DATABASE_URL.startswith("sqlite"):
+    engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+else:
+    engine = create_engine(DATABASE_URL)
 
-# session maker
-SessionLocal = sessionmaker(
-    autocommit=False,
-    autoflush=False,
-    bind=engine
-)
+# Configure session maker
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# base class
+# Declare base model
 Base = declarative_base()
 
-
-# dependency (VERY IMPORTANT for FastAPI)
+# FastAPI database dependency
 def get_db():
     db = SessionLocal()
     try:
