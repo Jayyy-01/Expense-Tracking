@@ -22,7 +22,7 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Expense Tracker API")
 
-# ✅ CORS Configuration
+#  CORS Configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -44,9 +44,7 @@ if os.path.exists(FRONTEND_DIR):
 @app.get("/", response_class=FileResponse)
 def read_index():
     index_path = os.path.join(FRONTEND_DIR, "index.html")
-    if not os.path.exists(index_path):
-        raise HTTPException(status_code=404, detail="Index file not found")
-    return index_path
+    return FileResponse(index_path, media_type="text/html")
 
 @app.get("/dashboard", response_class=FileResponse)
 def read_dashboard():
